@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>中郷FCコンパス 完成版</title>
+<style>
+:root{--green:#2f7d70;--dark:#172133;--pale:#eef8f5;--line:#d8e2e6;--blue:#2f68ee;--red:#d63b35}
+*{box-sizing:border-box}
+body{margin:0;background:#f7fbfa;color:var(--dark);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;font-weight:800}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 120px}
+.hero{background:linear-gradient(135deg,#107766,#245a55);color:#fff;border-radius:24px;padding:24px 22px;margin:8px 0 18px;box-shadow:0 8px 24px #0001}
+.hero h1{font-size:28px;line-height:1.25;margin:0 0 8px}.hero p{margin:0;font-size:15px;line-height:1.6;opacity:.95}
+.tabs{display:flex;gap:8px;margin:12px 0 18px}.tab{flex:1;border:2px solid var(--line);background:white;border-radius:18px;padding:13px 4px;font-size:15px;font-weight:900;color:#5f6c6b}.tab.active{background:var(--green);border-color:var(--green);color:white}
+.card{background:#fff;border:2px solid var(--line);border-radius:24px;padding:20px;margin:16px 0;box-shadow:0 4px 16px #00000008}
+.badge{display:inline-block;background:var(--pale);color:var(--green);padding:8px 14px;border-radius:999px;font-size:15px;margin-bottom:8px}
+h2{font-size:28px;margin:4px 0 20px}h3{font-size:20px;margin:18px 0 10px}
+label{display:block;margin:16px 0 8px;font-size:17px;color:#293547}
+input,select,textarea{width:100%;border:2px solid #d5dde3;border-radius:16px;background:#fff;color:#111827;font-size:20px;font-weight:900;padding:16px}
+textarea{min-height:150px;font-size:16px;font-weight:800;line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;border:0;border-radius:18px;padding:17px 12px;margin:14px 0 4px;font-size:22px;font-weight:900;background:var(--blue);color:#fff}
+.btn.green{background:var(--green)}.btn.red{background:var(--red)}.btn.dark{background:#111827}.btn.light{background:#eef5f3;color:#275e55}
+.stepper{display:flex;align-items:center;gap:8px}.stepper button{width:54px;height:54px;border:0;border-radius:16px;background:#e6f2ef;color:var(--green);font-size:30px;font-weight:900}.num{flex:1;text-align:center;border:2px solid #d5dde3;border-radius:16px;padding:14px 0;font-size:28px;background:#fff}
+.check{display:flex;align-items:center;gap:12px;margin:16px 0}.check input{width:36px;height:36px}.check label{margin:0}
+.result{border:2px dashed #abc0d4;background:#fbfefd;border-radius:18px;padding:16px;margin-top:16px;line-height:1.8;font-size:18px;white-space:pre-wrap}
+.small{font-size:14px;color:#687282;line-height:1.6;font-weight:700}
+.row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #e7ecef;padding:12px 0;align-items:center}.row b{font-size:17px}.row span{color:#687282;font-size:14px}
+.hide{display:none}
+.footer{position:fixed;left:0;right:0;bottom:0;background:#ffffffee;backdrop-filter:blur(12px);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:12px;border-top:1px solid #dde7e5}
+.footer button{flex:1;border:0;border-radius:18px;padding:16px 8px;font-size:20px;font-weight:900}.footer .copy{background:var(--green);color:white}
+@media(max-width:390px){.wrap{padding-left:12px;padding-right:12px}.hero h1{font-size:24px}h2{font-size:24px}.tab{font-size:13px}.stepper button{width:48px}.num{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>ちはる専用<br>中郷FCコンパス 完成版</h1>
+    <p>応援班の必要台数計算・配車交通費・LINE文コピーまで、スマホだけで完結。</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="calc">計算</button>
+    <button class="tab" data-tab="line">LINE文</button>
+    <button class="tab" data-tab="history">履歴</button>
+    <button class="tab" data-tab="settings">設定</button>
+  </div>
+
+  <section id="calc">
+    <div class="card">
+      <span class="badge">応援班 台数計算</span>
+      <h2>必要台数を計算</h2>
+      <div class="grid2">
+        <div><label for="players">選手人数</label><input id="players" type="number" inputmode="numeric" value="0"></div>
+        <div><label for="supporters">応援・保護者人数</label><input id="supporters" type="number" inputmode="numeric" value="0"></div>
+        <div><label for="capacity">車1台に乗れる人数</label><input id="capacity" type="number" inputmode="numeric" value="6"></div>
+        <div><label for="secured">既に確保済みの台数</label><input id="secured" type="number" inputmode="numeric" value="0"></div>
+      </div>
+      <label for="destForCars">遠征先</label>
+      <select id="destForCars"></select>
+      <button class="btn" id="carsCalcBtn">計算する</button>
+      <div id="carsResult" class="result">未計算です</div>
+      <button class="btn green" id="applyCarsBtn">必要台数を普通車に反映</button>
+    </div>
+
+    <div class="card">
+      <span class="badge">配車交通費</span>
+      <h2>交通費を計算</h2>
+      <label for="destForFee">遠征先</label>
+      <select id="destForFee"></select>
+      <div class="grid2">
+        <div>
+          <label>普通車</label>
+          <div class="stepper">
+            <button type="button" data-step="normal:-1">−</button>
+            <div id="normal" class="num">0</div>
+            <button type="button" data-step="normal:1">＋</button>
+          </div>
+        </div>
+        <div>
+          <label>軽自動車</label>
+          <div class="stepper">
+            <button type="button" data-step="kei:-1">−</button>
+            <div id="kei" class="num">0</div>
+            <button type="button" data-step="kei:1">＋</button>
+          </div>
+        </div>
+      </div>
+      <div class="check"><input id="roundTrip" type="checkbox" checked><label for="roundTrip">往復で計算する</label></div>
+      <button class="btn" id="feeCalcBtn">計算する</button>
+      <div id="feeResult" class="result">未計算です</div>
+      <button class="btn green" id="saveHistoryBtn">この内容を履歴に保存</button>
+    </div>
+  </section>
+
+  <section id="line" class="hide">
+    <div class="card">
+      <span class="badge">LINE共有</span>
+      <h2>LINE文</h2>
+      <textarea id="lineText" readonly>まだ計算されていません。</textarea>
+      <button class="btn green" id="copyLineBtn">LINE文コピー</button>
+      <p class="small">コピー後、LINEに貼り付けて使ってね。</p>
+    </div>
+  </section>
+
+  <section id="history" class="hide">
+    <div class="card">
+      <span class="badge">履歴</span>
+      <h2>保存した履歴</h2>
+      <div id="historyList" class="small">履歴はまだありません。</div>
+      <button class="btn red" id="clearHistoryBtn">履歴を全削除</button>
+    </div>
+  </section>
+
+  <section id="settings" class="hide">
+    <div class="card">
+      <span class="badge">設定</span>
+      <h2>料金設定</h2>
+      <div class="grid2">
+        <div><label for="localFee">下道 1台</label><input id="localFee" type="number" value="1500"></div>
+        <div><label for="highwayFee">高速 1台</label><input id="highwayFee" type="number" value="2000"></div>
+      </div>
+      <p class="small">現在の総会決定事項：下道1,500円／高速2,000円で計算。</p>
+      <h3>登録済み行き先</h3>
+      <div id="destList"></div>
+      <button class="btn dark" id="resetBtn">初期状態に戻す</button>
+    </div>
+  </section>
+</div>
+
+<div class="footer">
+  <button id="topBtn">上へ</button>
+  <button class="copy" id="footerCopyBtn">LINE文コピー</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const destinations = [
+    {id:"ooi", name:"大飯方面", type:"下道", km:45, memo:"往復下道"},
+    {id:"maruoka", name:"丸岡方面", type:"高速", km:75, memo:"敦賀IC〜鯖江IC、その後下道"},
+    {id:"mikuni", name:"三国方面", type:"高速", km:95, memo:"敦賀IC〜鯖江IC、その後下道"},
+    {id:"reihoku", name:"嶺北方面", type:"高速", km:65, memo:"片道60km超なら高速扱い"},
+    {id:"other", name:"その他・手入力用", type:"下道", km:0, memo:"必要に応じて確認"}
+  ];
+
+  let normalCars = 0;
+  let keiCars = 0;
+  let lastLine = "まだ計算されていません。";
+  let lastRecord = null;
+  let lastNeededCars = 0;
+
+  const $ = (id) => document.getElementById(id);
+  const n = (id) => Number($(id).value || 0);
+  const yen = (num) => Number(num || 0).toLocaleString("ja-JP") + "円";
+  const selectedDestination = (selectId) => destinations.find(d => d.id === $(selectId).value) || destinations[0];
+
+  function fillSelect(selectId){
+    const select = $(selectId);
+    select.innerHTML = destinations.map(d => `<option value="${d.id}">${d.name}（${d.type}）</option>`).join("");
+  }
+
+  function getUnitFee(type){
+    return Number($(type === "高速" ? "highwayFee" : "localFee").value || 0);
+  }
+
+  function setLine(text){
+    lastLine = text;
+    $("lineText").value = text;
+  }
+
+  function updateCarDisplay(){
+    $("normal").textContent = normalCars;
+    $("kei").textContent = keiCars;
+  }
+
+  function switchTab(tabId){
+    ["calc","line","history","settings"].forEach(id => $(id).classList.toggle("hide", id !== tabId));
+    document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabId));
+    if(tabId === "history") renderHistory();
+    if(tabId === "settings") renderDestList();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function calcCars(){
+    const players = n("players");
+    const supporters = n("supporters");
+    const capacity = Math.max(n("capacity"), 1);
+    const secured = n("secured");
+    const totalPeople = players + supporters;
+    const needed = Math.ceil(totalPeople / capacity);
+    const additional = Math.max(needed - secured, 0);
+    const d = selectedDestination("destForCars");
+    const unitFee = getUnitFee(d.type);
+    const totalFee = additional * unitFee;
+
+    lastNeededCars = needed;
+
+    $("carsResult").textContent =
+`遠征先：${d.name}
+区分：${d.type}（配車交通費 ${yen(unitFee)}/台）
+選手人数：${players}人
+応援・保護者人数：${supporters}人
+人数合計：${totalPeople}人
+必要台数：${needed}台
+確保済み：${secured}台
+追加で必要：${additional}台
+配車交通費 合計目安：${yen(totalFee)}`;
+
+    const line =
+`【応援班 台数確認】
+遠征先：${d.name}
+区分：${d.type}
+選手人数：${players}人
+応援・保護者人数：${supporters}人
+人数合計：${totalPeople}人
+必要台数：${needed}台
+確保済み：${secured}台
+追加で必要：${additional}台
+配車交通費目安：${yen(totalFee)}`;
+
+    setLine(line);
+    lastRecord = {date:new Date().toLocaleString("ja-JP"), kind:"台数", text:line, total:totalFee};
+  }
+
+  function applyCarsToFee(){
+    if(!lastNeededCars) calcCars();
+    normalCars = lastNeededCars;
+    keiCars = 0;
+    $("destForFee").value = $("destForCars").value;
+    updateCarDisplay();
+    calcFee();
+  }
+
+  function stepCar(which, delta){
+    if(which === "normal") normalCars = Math.max(0, normalCars + delta);
+    if(which === "kei") keiCars = Math.max(0, keiCars + delta);
+    updateCarDisplay();
+  }
+
+  function calcFee(){
+    const d = selectedDestination("destForFee");
+    const unitFee = getUnitFee(d.type);
+    const totalCars = normalCars + keiCars;
+    const totalFee = totalCars * unitFee;
+
+    $("feeResult").textContent =
+`遠征先：${d.name}
+区分：${d.type}（${yen(unitFee)}/台）
+普通車：${normalCars}台
+軽自動車：${keiCars}台
+合計台数：${totalCars}台
+配車交通費 合計：${yen(totalFee)}
+メモ：${d.memo}`;
+
+    const line =
+`【配車交通費】
+遠征先：${d.name}
+区分：${d.type}
+普通車：${normalCars}台
+軽自動車：${keiCars}台
+合計台数：${totalCars}台
+配車交通費合計：${yen(totalFee)}
+${d.memo}`;
+
+    setLine(line);
+    lastRecord = {date:new Date().toLocaleString("ja-JP"), kind:"交通費", text:line, total:totalFee};
+  }
+
+  async function copyLine(){
+    $("lineText").value = lastLine;
+    try{
+      await navigator.clipboard.writeText(lastLine);
+      alert("LINE文をコピーしたよ");
+    }catch(e){
+      $("lineText").focus();
+      $("lineText").select();
+      document.execCommand("copy");
+      alert("コピーしたよ");
+    }
+  }
+
+  function saveHistory(){
+    if(!lastRecord) calcFee();
+    const list = JSON.parse(localStorage.getItem("nakagoHistory") || "[]");
+    list.unshift(lastRecord);
+    localStorage.setItem("nakagoHistory", JSON.stringify(list.slice(0, 30)));
+    alert("履歴に保存したよ");
+  }
+
+  function renderHistory(){
+    const list = JSON.parse(localStorage.getItem("nakagoHistory") || "[]");
+    $("historyList").innerHTML = list.length
+      ? list.map(r => `<div class="row"><div><b>${r.date}　${r.kind}</b><br><span>${r.text.replace(/\n/g,"<br>")}</span></div></div>`).join("")
+      : "履歴はまだありません。";
+  }
+
+  function clearHistory(){
+    if(confirm("履歴を全部消す？")){
+      localStorage.removeItem("nakagoHistory");
+      renderHistory();
+    }
+  }
+
+  function renderDestList(){
+    $("destList").innerHTML = destinations.map(d =>
+      `<div class="row"><div><b>${d.name}</b><br><span>${d.memo}</span></div><b>${d.km}km<br>${d.type}</b></div>`
+    ).join("");
+  }
+
+  function resetDefaults(){
+    localStorage.clear();
+    alert("初期状態に戻したよ");
+    location.reload();
+  }
+
+  function init(){
+    fillSelect("destForCars");
+    fillSelect("destForFee");
+    updateCarDisplay();
+    renderDestList();
+    setLine(lastLine);
+
+    document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+    $("carsCalcBtn").addEventListener("click", calcCars);
+    $("applyCarsBtn").addEventListener("click", applyCarsToFee);
+    $("feeCalcBtn").addEventListener("click", calcFee);
+    $("saveHistoryBtn").addEventListener("click", saveHistory);
+    $("copyLineBtn").addEventListener("click", copyLine);
+    $("footerCopyBtn").addEventListener("click", copyLine);
+    $("clearHistoryBtn").addEventListener("click", clearHistory);
+    $("resetBtn").addEventListener("click", resetDefaults);
+    $("topBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+    document.querySelectorAll("[data-step]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const [which, delta] = btn.dataset.step.split(":");
+        stepCar(which, Number(delta));
+      });
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
