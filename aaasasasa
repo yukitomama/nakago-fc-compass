@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>中郷FC交通費コンパス Ver.4</title>
+<style>
+:root{--bg:#f5faf8;--card:#fff;--ink:#14211f;--muted:#667a76;--main:#0f766e;--sub:#14b8a6;--line:#dce9e6;--soft:#e7f7f4;--warn:#fff7ed;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif}
+.app{max-width:680px;margin:0 auto;padding:14px 14px 96px}
+.hero{background:linear-gradient(135deg,#0f766e,#115e59);color:#fff;border-radius:24px;padding:20px 18px;box-shadow:0 10px 28px #0f766e22;position:relative;overflow:hidden}
+.hero:after{content:"⚽";position:absolute;right:14px;top:8px;font-size:80px;opacity:.14}
+h1{font-size:23px;line-height:1.25;margin:0 0 8px}.hero p{margin:0;font-size:13px;line-height:1.5;opacity:.92}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0}
+.tab{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 2px;font-size:11px;font-weight:900;color:var(--muted)}
+.tab.active{background:var(--main);color:#fff;border-color:var(--main)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin:12px 0;box-shadow:0 5px 18px #10201d0d}
+.title{font-size:17px;font-weight:900;margin:0 0 12px;display:flex;gap:8px;align-items:center}
+.label{font-size:12px;color:var(--muted);font-weight:900;margin:12px 0 6px}
+select,input,textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:13px;font-size:16px;color:var(--ink)}
+input[type=number]{text-align:right}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stepper{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center}
+.btn{border:0;border-radius:14px;padding:13px 12px;font-size:15px;font-weight:900;background:var(--main);color:#fff}
+.btn.secondary{background:#e8f4f1;color:var(--main)}.btn.gray{background:#eef2f1;color:#344440}.btn.danger{background:#fee2e2;color:var(--danger)}.btn.line{background:#06c755}
+.num{background:#f8fbfa;border:1px solid var(--line);border-radius:14px;text-align:center;font-size:24px;font-weight:900;padding:9px}
+.check{display:flex;gap:9px;align-items:center;margin-top:10px}.check input{width:auto;transform:scale(1.3)}.check span{font-size:14px;font-weight:900}
+.result{background:linear-gradient(180deg,#ecfffb,#fff);border:2px solid #b9eee6}
+.big{font-size:38px;font-weight:1000;color:var(--main);text-align:right;margin:4px 0}
+.pill{display:inline-block;background:var(--soft);color:var(--main);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-left:auto}
+.sumrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.sumrow:last-child{border-bottom:0}.sumrow b{font-size:16px;text-align:right}.mini{font-size:12px;color:var(--muted);line-height:1.55}
+.hidden{display:none!important}.textarea{min-height:220px;white-space:pre-wrap;line-height:1.55;font-size:14px;background:#fbfefd;border:1px solid var(--line);border-radius:16px;padding:13px}
+.listitem{border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0;background:#fff}.listitem h3{font-size:14px;margin:0 0 6px}.listitem p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
+.warn{background:var(--warn);border-color:#fed7aa}.note{background:#f0fdfa;border:1px solid #99f6e4;border-radius:16px;padding:12px;font-size:12px;color:#155e58;line-height:1.55}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #edf2f1;padding:8px 4px;text-align:left}th{color:var(--muted)}.right{text-align:right}
+.dataGrid{display:grid;grid-template-columns:1.25fr .65fr 1fr;gap:6px;align-items:center;font-size:12px}.dataGrid.header{font-weight:900;color:var(--muted);margin-top:8px}.dataGrid input{font-size:13px;padding:9px;border-radius:10px}.dataRow{margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;color:var(--main)}.chip.on{background:var(--main);color:white}
+.payrow{display:grid;grid-template-columns:1.2fr .85fr .75fr 42px;gap:6px;align-items:center;margin:7px 0}.payrow input,.payrow select{padding:10px;font-size:14px;border-radius:12px}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#fbfefd;border:1px solid var(--line);border-radius:16px;padding:12px}.stat .k{font-size:12px;color:var(--muted);font-weight:900}.stat .v{font-size:21px;font-weight:1000;color:var(--main);margin-top:4px}
+.footer{position:fixed;bottom:0;left:0;right:0;background:#f5faf8ee;backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:9px 14px max(9px,env(safe-area-inset-bottom))}
+.footer .inner{max-width:680px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#10201d;color:#fff;border-radius:999px;padding:10px 14px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:5}.toast.show{opacity:1}
+@media(max-width:440px){.tabs{grid-template-columns:repeat(5,1fr)}.big{font-size:32px}.tab{font-size:10px}.payrow{grid-template-columns:1fr .8fr .65fr 38px}}
+</style>
+</head>
+<body>
+<div class="app">
+<section class="hero">
+  <h1>中郷FC交通費コンパス<br>完全版</h1>
+  <p>35会場・検索・お気に入り・全体LINE・会計用・名前入り支払一覧・月別履歴・年間レポート入り。</p>
+</section>
+
+<div class="tabs">
+  <button class="tab active" data-tab="calc">計算</button>
+  <button class="tab" data-tab="share">LINE</button>
+  <button class="tab" data-tab="payees">支払</button>
+  <button class="tab" data-tab="report">集計</button>
+  <button class="tab" data-tab="settings">設定</button>
+</div>
+
+<section id="calc" class="pane">
+  <div class="card">
+    <h2 class="title">🚗 応援車交通費</h2>
+    <div class="row">
+      <div><div class="label">試合日</div><input id="gameDate" type="date"></div>
+      <div><div class="label">カテゴリー</div><select id="category"><option>U12</option><option>シゴロ</option><option>U11</option><option>U10</option><option>U9</option><option>U8</option><option>全学年</option><option>その他</option></select></div>
+    </div>
+    <div class="label">会場検索</div>
+    <input id="searchVenue" placeholder="例：春江、三国、武生、福知山">
+    <div class="chips" id="favoriteChips"></div>
+    <div class="label">会場</div>
+    <select id="dest"></select>
+
+    <div class="row">
+      <div><div class="label">普通車</div><div class="stepper"><button class="btn secondary" onclick="step('normal',-1)">−</button><div class="num" id="normalView">0</div><button class="btn secondary" onclick="step('normal',1)">＋</button></div></div>
+      <div><div class="label">軽自動車</div><div class="stepper"><button class="btn secondary" onclick="step('kei',-1)">−</button><div class="num" id="keiView">0</div><button class="btn secondary" onclick="step('kei',1)">＋</button></div></div>
+    </div>
+
+    <div class="label">メモ</div>
+    <input id="memo" placeholder="例：監督同乗、高速なし、領収書確認など">
+
+    <div class="check"><input type="checkbox" id="roundTrip" checked><span>往復で計算する</span></div>
+    <div class="check"><input type="checkbox" id="useToll" checked><span>高速代も含める</span></div>
+    <div class="check"><input type="checkbox" id="paid"><span>支払い済みにする</span></div>
+  </div>
+
+  <div class="card result">
+    <h2 class="title">💰 計算結果 <span class="pill" id="carCount">0台</span></h2>
+    <div class="label">支払合計</div>
+    <div class="big" id="total">0円</div>
+    <div id="breakdown"></div>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="saveHistory()">この内容を履歴に保存</button>
+    <button class="btn line" style="width:100%;margin-top:8px" onclick="copyText('lineText')">全体LINE用をコピー</button>
+  </div>
+</section>
+
+<section id="share" class="pane hidden">
+  <div class="card">
+    <h2 class="title">📢 全体LINE用</h2>
+    <div class="textarea" id="lineText"></div>
+    <button class="btn line" style="width:100%;margin-top:10px" onclick="copyText('lineText')">全体LINE用をコピー</button>
+  </div>
+  <div class="card">
+    <h2 class="title">🧾 会計さん用</h2>
+    <div class="textarea" id="accountingText"></div>
+    <button class="btn" style="width:100%;margin-top:10px" onclick="copyText('accountingText')">会計さん用をコピー</button>
+  </div>
+</section>
+
+<section id="payees" class="pane hidden">
+  <div class="card">
+    <h2 class="title">👥 名前入り支払一覧</h2>
+    <p class="mini">名前を入れて車種を選ぶと、会計さん用の支払チェック表が作れるよ。</p>
+    <div id="payeeRows"></div>
+    <button class="btn secondary" style="width:100%;margin-top:10px" onclick="addPayee()">支払先を追加</button>
+  </div>
+  <div class="card">
+    <h2 class="title">📋 支払チェック表</h2>
+    <div class="textarea" id="payeeText"></div>
+    <button class="btn" style="width:100%;margin-top:10px" onclick="copyText('payeeText')">支払一覧をコピー</button>
+  </div>
+</section>
+
+<section id="report" class="pane hidden">
+  <div class="card">
+    <h2 class="title">📚 保存履歴・月別集計</h2>
+    <div class="statgrid" id="monthStats"></div>
+    <div id="historyList"></div>
+    <button class="btn danger" style="width:100%;margin-top:10px" onclick="clearHistory()">履歴を全部消す</button>
+  </div>
+  <div class="card">
+    <h2 class="title">📊 年間交通費レポート</h2>
+    <div class="textarea" id="annualReport"></div>
+    <button class="btn" style="width:100%;margin-top:10px" onclick="copyText('annualReport')">年間レポートをコピー</button>
+  </div>
+</section>
+
+<section id="settings" class="pane hidden">
+  <div class="card">
+    <h2 class="title">⚙️ 共通設定</h2>
+    <div class="row">
+      <div><div class="label">ガソリン単価 円/L</div><input id="gasPrice" type="number"></div>
+      <div><div class="label">燃費 km/L</div><input id="fuelKmL" type="number" step="0.1"></div>
+    </div>
+    <div class="row">
+      <div><div class="label">ガソリン代丸め</div><select id="roundMode"><option value="100">100円単位</option><option value="50">50円単位</option><option 
